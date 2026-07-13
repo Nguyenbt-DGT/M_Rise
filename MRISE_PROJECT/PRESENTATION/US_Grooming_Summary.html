@@ -1,0 +1,625 @@
+<title>M-Rise → AMS Sync — Grooming Summary</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #f0eee7;
+    --ink: #1c2321;
+    --ink-soft: #4b554f;
+    --ink-faint: #7c8680;
+    --accent: #0f6e5c;
+    --accent-ink: #ffffff;
+    --accent-soft: #e3efea;
+    --accent-line: #bcd8cd;
+    --flag: #9a6a1f;
+    --flag-soft: #fbf1de;
+    --flag-line: #e8cf9d;
+    --good: #2e7d53;
+    --good-soft: #e6f2ea;
+    --line: #dcd9ce;
+    --line-strong: #c4c0b2;
+    --shadow: 0 1px 2px rgba(28, 35, 33, 0.06), 0 8px 24px -12px rgba(28, 35, 33, 0.18);
+    --radius: 10px;
+    --serif: Iowan Old Style, Palatino Linotype, Palatino, Georgia, "Noto Serif", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: "SF Mono", "Cascadia Code", Consolas, "Roboto Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12181a;
+      --surface: #182120;
+      --surface-2: #1e2827;
+      --ink: #e9ede9;
+      --ink-soft: #a8b3ac;
+      --ink-faint: #778078;
+      --accent: #3fbd9e;
+      --accent-ink: #08201a;
+      --accent-soft: #17302b;
+      --accent-line: #2a4a41;
+      --flag: #e6b465;
+      --flag-soft: #2c2312;
+      --flag-line: #4a3a1c;
+      --good: #4fbf87;
+      --good-soft: #16281f;
+      --line: #2a3634;
+      --line-strong: #3a4846;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12181a; --surface: #182120; --surface-2: #1e2827; --ink: #e9ede9; --ink-soft: #a8b3ac;
+    --ink-faint: #778078; --accent: #3fbd9e; --accent-ink: #08201a; --accent-soft: #17302b;
+    --accent-line: #2a4a41; --flag: #e6b465; --flag-soft: #2c2312; --flag-line: #4a3a1c;
+    --good: #4fbf87; --good-soft: #16281f; --line: #2a3634; --line-strong: #3a4846;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f5f1; --surface: #ffffff; --surface-2: #f0eee7; --ink: #1c2321; --ink-soft: #4b554f;
+    --ink-faint: #7c8680; --accent: #0f6e5c; --accent-ink: #ffffff; --accent-soft: #e3efea;
+    --accent-line: #bcd8cd; --flag: #9a6a1f; --flag-soft: #fbf1de; --flag-line: #e8cf9d;
+    --good: #2e7d53; --good-soft: #e6f2ea; --line: #dcd9ce; --line-strong: #c4c0b2;
+    --shadow: 0 1px 2px rgba(28, 35, 33, 0.06), 0 8px 24px -12px rgba(28, 35, 33, 0.18);
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); }
+  h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; color: var(--ink); }
+  code, .mono { font-family: var(--mono); font-size: 0.86em; }
+  .eyebrow {
+    font-family: var(--sans); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--ink-faint);
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    max-width: 1120px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  }
+  .brand { display: flex; flex-direction: column; gap: 1px; margin-right: auto; }
+  .brand .name { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; }
+  .brand .sub { font-size: 0.74rem; color: var(--ink-faint); }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tab-btn {
+    font-family: var(--sans); font-size: 0.86rem; font-weight: 600; color: var(--ink-soft);
+    background: transparent; border: 1px solid transparent; border-radius: 999px;
+    padding: 7px 14px; cursor: pointer; white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--ink); background: var(--surface-2); }
+  .tab-btn[aria-selected="true"] {
+    background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+  }
+  .tab-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- Shell ---------- */
+  main { max-width: 1120px; margin: 0 auto; padding: 40px 24px 96px; }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fade 0.18s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .panel.active { animation: none; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* ---------- Overview ---------- */
+  .lede { max-width: 68ch; }
+  .lede h1 { font-size: 2rem; margin-bottom: 10px; }
+  .lede p { color: var(--ink-soft); font-size: 1.05rem; }
+
+  .chain {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 36px 0 8px;
+  }
+  .chain-card {
+    position: relative; background: var(--surface); border: 1px solid var(--line);
+    padding: 18px 16px; display: flex; flex-direction: column; gap: 6px; min-height: 128px;
+  }
+  .chain-card:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+  .chain-card:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
+  .chain-card + .chain-card { border-left: none; }
+  .chain-card .order-no {
+    font-family: var(--serif); font-size: 1.5rem; color: var(--accent); font-weight: 700;
+  }
+  .chain-card .order-theme { font-weight: 700; font-size: 0.92rem; }
+  .chain-card .order-count { font-size: 0.78rem; color: var(--ink-faint); }
+  .chain-arrow {
+    position: absolute; right: -13px; top: 50%; transform: translateY(-50%); z-index: 2;
+    width: 24px; height: 24px; border-radius: 50%; background: var(--accent);
+    color: var(--accent-ink); display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; border: 2px solid var(--bg);
+  }
+  .chain-card:last-child .chain-arrow { display: none; }
+  .chain-caption { font-size: 0.82rem; color: var(--ink-faint); margin: 10px 0 40px; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  thead th {
+    font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-faint); background: var(--surface-2); font-weight: 700; white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  td.num, th.num { font-variant-numeric: tabular-nums; }
+
+  .pill {
+    display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em;
+    padding: 2px 8px; border-radius: 999px; white-space: nowrap;
+  }
+  .pill-post { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--accent-line); }
+  .pill-get { background: var(--good-soft); color: var(--good); border: 1px solid var(--good); }
+
+  section.block { margin-top: 44px; }
+  section.block h2 { font-size: 1.3rem; margin-bottom: 4px; }
+  section.block .block-sub { color: var(--ink-faint); font-size: 0.88rem; margin-bottom: 16px; }
+
+  /* ---------- Order panel ---------- */
+  .order-head {
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px;
+  }
+  .order-head .order-tag {
+    font-family: var(--serif); font-size: 2.6rem; color: var(--accent); font-weight: 700; line-height: 1;
+  }
+  .order-head h1 { font-size: 1.55rem; max-width: 46ch; }
+  .order-status { display: flex; gap: 8px; margin: 14px 0 22px; flex-wrap: wrap; }
+  .status-chip {
+    font-size: 0.76rem; font-weight: 700; padding: 4px 10px; border-radius: 999px;
+    background: var(--good-soft); color: var(--good); border: 1px solid var(--good);
+  }
+  .status-chip.count { background: var(--surface-2); color: var(--ink-soft); border-color: var(--line-strong); }
+
+  .objective {
+    background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0; padding: 18px 22px; margin: 18px 0 32px;
+    font-family: var(--serif); font-size: 1.05rem; color: var(--ink); max-width: 76ch;
+  }
+  .objective .obj-label {
+    display: block; font-family: var(--sans); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+  @media (max-width: 860px) { .cols3 { grid-template-columns: 1fr; } }
+  .flow-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .flow-card .flow-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--ink-faint); margin-bottom: 8px; display: block;
+  }
+  .flow-card p, .flow-card ul { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+  .flow-card ul { padding-left: 1.1em; }
+  .flow-card li + li { margin-top: 4px; }
+
+  .ac-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+  .ac-item {
+    display: grid; grid-template-columns: 44px 1fr; gap: 14px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px;
+  }
+  .ac-item .ac-no {
+    font-family: var(--serif); font-weight: 700; color: var(--accent); font-size: 1.1rem;
+  }
+  .ac-item h4 { font-size: 0.95rem; margin-bottom: 4px; }
+  .ac-item p { margin: 0; font-size: 0.87rem; color: var(--ink-soft); }
+  .ac-item .gwt { font-size: 0.82rem; color: var(--ink-faint); margin-top: 5px; }
+  .ac-item .gwt b { color: var(--ink-soft); font-weight: 700; }
+
+  .flags {
+    background: var(--flag-soft); border: 1px solid var(--flag-line); border-radius: var(--radius);
+    padding: 18px 20px 6px; margin: 8px 0 40px;
+  }
+  .flags .flags-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .flags .flags-head .dot {
+    width: 9px; height: 9px; border-radius: 50%; background: var(--flag); flex: none;
+  }
+  .flags h3 { font-size: 0.95rem; color: var(--flag); font-family: var(--sans); font-weight: 700; }
+  .flags ol { margin: 0; padding: 0 0 12px 1.2em; }
+  .flags li { font-size: 0.88rem; margin-bottom: 10px; color: var(--ink); }
+  .flags li b { font-weight: 700; }
+  .flags li .who {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase;
+    color: var(--flag); margin-left: 6px;
+  }
+
+  footer.note {
+    max-width: 1120px; margin: 0 auto; padding: 0 24px 60px; color: var(--ink-faint); font-size: 0.8rem;
+  }
+  hr.rule { border: none; border-top: 1px solid var(--line); margin: 40px 0; }
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="name">M-Rise → AMS Sync</span>
+      <span class="sub">Backlog grooming summary · 13 APIs · 4 Orders · prepared by BA</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Order sections">
+      <button class="tab-btn" role="tab" data-tab="overview" aria-selected="true">Overview</button>
+      <button class="tab-btn" role="tab" data-tab="order1" aria-selected="false">Order 1</button>
+      <button class="tab-btn" role="tab" data-tab="order2" aria-selected="false">Order 2</button>
+      <button class="tab-btn" role="tab" data-tab="order3" aria-selected="false">Order 3</button>
+      <button class="tab-btn" role="tab" data-tab="order4" aria-selected="false">Order 4</button>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ OVERVIEW ============ -->
+  <div class="panel active" id="panel-overview">
+    <div class="lede">
+      <span class="eyebrow">Grooming packet · US1–US4</span>
+      <h1 style="margin-top:6px;">Replacing two legacy e-learning systems with a 4-order sync into AMS</h1>
+      <p>M-Rise is taking over class, exam, result, license, and e-certificate processing that two retiring systems
+      used to handle, and pushing that data into the CAS system (<b>AMS</b>) through a middleware layer called the
+      <b>Learning Adapter</b>. The 13 APIs in scope split into four dependent Orders — each one has to land before the
+      next can be trusted to have the data it needs. This packet is the one-pager for grooming: objective, flow,
+      acceptance criteria, and the open questions the team should actually talk about.</p>
+    </div>
+
+    <div class="chain">
+      <div class="chain-card">
+        <span class="order-no">01</span>
+        <span class="order-theme">Class setup</span>
+        <span class="order-count">3 APIs · template, exam, class</span>
+        <div class="chain-arrow">→</div>
+      </div>
+      <div class="chain-card">
+        <span class="order-no">02</span>
+        <span class="order-theme">Candidate results</span>
+        <span class="order-count">3 APIs · attendance, training, CPA</span>
+        <div class="chain-arrow">→</div>
+      </div>
+      <div class="chain-card">
+        <span class="order-no">03</span>
+        <span class="order-theme">License &amp; plan code</span>
+        <span class="order-count">5 APIs · eligibility, grant, plan codes</span>
+        <div class="chain-arrow">→</div>
+      </div>
+      <div class="chain-card">
+        <span class="order-no">04</span>
+        <span class="order-theme">E-certificate</span>
+        <span class="order-count">2 APIs · save + retrieve</span>
+      </div>
+    </div>
+    <p class="chain-caption">Each Order gates the next: Order 1's class/exam shell must exist before Order 2's results can attach to it; Order 2's results feed Order 3's license/plan-code grants; Order 3's granted license gates Order 4's e-certificate. All 13 APIs run M-Rise → Learning Adapter → AMS — M-Rise never calls AMS directly.</p>
+
+    <section class="block">
+      <h2>All 13 APIs at a glance</h2>
+      <p class="block-sub">Pulled from US1–US4 (all approved). Use this as the master checklist during grooming.</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th class="num">Order</th><th>API</th><th>Verb</th><th>Purpose</th><th>Primary target table</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="num">1</td><td class="mono">sync-class-template</td><td><span class="pill pill-post">POST</span></td><td>Sync class template + linked plan codes</td><td class="mono">TAMS_TEMPLS</td></tr>
+            <tr><td class="num">1</td><td class="mono">exam-info/sync</td><td><span class="pill pill-post">POST</span></td><td>Sync exam master info</td><td class="mono">TAMS_EXAM_DETAILS</td></tr>
+            <tr><td class="num">1</td><td class="mono">sync/sync-class</td><td><span class="pill pill-post">POST</span></td><td>Sync class information</td><td class="mono">TAMS_CLASSES</td></tr>
+            <tr><td class="num">2</td><td class="mono">exam-result/sync</td><td><span class="pill pill-post">POST</span></td><td>Sync exam attendance + score</td><td class="mono">TAMS_EXAM_RSLTS</td></tr>
+            <tr><td class="num">2</td><td class="mono">training-result/sync</td><td><span class="pill pill-post">POST</span></td><td>Sync training result, education background, MOF approval</td><td class="mono">TAMS_TRAINING_RSLTS</td></tr>
+            <tr><td class="num">2</td><td class="mono">inform-cpa-result/sync</td><td><span class="pill pill-post">POST</span></td><td>Flag candidate result as sent to AP system</td><td class="mono">TAMS_CANDIDATE_RSLTS</td></tr>
+            <tr><td class="num">3</td><td class="mono">conditions/license</td><td><span class="pill pill-post">POST</span></td><td>Check license-grant eligibility (read-only)</td><td class="mono">TAMS_EDUCATION_BACKGROUNDS</td></tr>
+            <tr><td class="num">3</td><td class="mono">plancode/refresh</td><td><span class="pill pill-post">POST</span></td><td>Update expiry/status of an existing plan code</td><td class="mono">TAMS_AGT_PRODUCT_DTLS</td></tr>
+            <tr><td class="num">3</td><td class="mono">plancode/assign</td><td><span class="pill pill-post">POST</span></td><td>Assign a new plan code to an agent</td><td class="mono">TAMS_AGT_PRODUCT_DTLS</td></tr>
+            <tr><td class="num">3</td><td class="mono">license/grant</td><td><span class="pill pill-post">POST</span></td><td>Grant license, archive old cert, MOF/product-code updates</td><td class="mono">TAMS_EDUCATION_BACKGROUNDS</td></tr>
+            <tr><td class="num">3</td><td class="mono">MIT-license/update</td><td><span class="pill pill-post">POST</span></td><td>Insert MIT candidate license/education record</td><td class="mono">TAMS_EDUCATION_BACKGROUNDS</td></tr>
+            <tr><td class="num">4</td><td class="mono">eCertificate/save</td><td><span class="pill pill-post">POST</span></td><td>Save issued e-certificate document reference</td><td class="mono">TWRK_AGT_CERTIFICATES</td></tr>
+            <tr><td class="num">4</td><td class="mono">eCertificate</td><td><span class="pill pill-get">GET</span></td><td>Retrieve e-certificate eligibility + delivery config</td><td class="mono">(read-only)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block">
+      <h2>Reading this packet</h2>
+      <p class="block-sub">Each Order tab has four parts: the <b>objective</b> (why it exists), the <b>flow</b> (trigger → pre-condition → post-condition), the <b>acceptance criteria</b> (what "done" means), and <b>discussion flags</b> — the open items, PO decisions, and assumptions the squad (PO/BA/BE) already surfaced while drafting. The amber flags are exactly what grooming is for: confirm them, challenge them, or accept them as logged risk.</p>
+    </section>
+  </div>
+
+  <!-- ============ ORDER 1 ============ -->
+  <div class="panel" id="panel-order1">
+    <div class="order-head">
+      <span class="order-tag">01</span>
+      <h1>Sync Class Setup Information — template, exam, class</h1>
+    </div>
+    <div class="order-status">
+      <span class="status-chip">Approved</span>
+      <span class="status-chip count">3 APIs</span>
+      <span class="status-chip count">Blocks Orders 2, 3, 4</span>
+    </div>
+
+    <div class="objective">
+      <span class="obj-label">Objective</span>
+      As <b>AMS System</b>, I want to receive class setup information from M-Rise through Learning Adapter, so
+      AMS can initialize the class template, exam information, and class information that candidate/agent
+      learning management and every downstream Order depends on.
+    </div>
+
+    <div class="cols3">
+      <div class="flow-card">
+        <span class="flow-label">Trigger</span>
+        <ul>
+          <li>Class template created/activated on M-Rise</li>
+          <li>Exam code successfully imported in a class</li>
+          <li>Training plan approved on M-Rise</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Pre-condition</span>
+        <ul>
+          <li>M-Rise has template/exam/class data ready</li>
+          <li>Learning Adapter is running</li>
+          <li>Related master data exists in AMS where required</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Post-condition</span>
+        <ul>
+          <li>AMS stores template, exam, and class records</li>
+          <li>Data is ready for Order 2 (attendance/result)</li>
+          <li>Every call is logged</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.15rem; margin-bottom:14px;">Acceptance criteria</h2>
+    <div class="ac-list">
+      <div class="ac-item"><span class="ac-no">01</span><div><h4>Sync class template successfully</h4><p class="gwt"><b>Given</b> a template is created/activated on M-Rise <b>When</b> Learning Adapter calls <code>sync-class-template</code> <b>Then</b> AMS inserts/updates/deletes by <code>action</code>, writes each plan code as its own row, and never duplicates on re-sync.</p></div></div>
+      <div class="ac-item"><span class="ac-no">02</span><div><h4>Sync exam information successfully</h4><p class="gwt"><b>Given</b> an exam code is imported on M-Rise <b>When</b> <code>exam-info/sync</code> is called <b>Then</b> AMS validates <code>examTypeCd</code> against <code>TAMS_EXAMS</code>, creates or updates the exam record, and rejects unknown exam types.</p></div></div>
+      <div class="ac-item"><span class="ac-no">03</span><div><h4>Sync class information successfully</h4><p class="gwt"><b>Given</b> a training plan is approved on M-Rise <b>When</b> <code>sync-class</code> is called <b>Then</b> AMS validates <code>templateCode</code> / <code>classType</code> exist, then inserts/updates/deletes the class, with no duplicates on re-sync.</p></div></div>
+      <div class="ac-item"><span class="ac-no">04</span><div><h4>Integration must go through Learning Adapter</h4><p class="gwt">AMS never receives an Order 1 request directly from M-Rise — every call is relayed by Learning Adapter.</p></div></div>
+      <div class="ac-item"><span class="ac-no">05</span><div><h4>Error handling &amp; logging</h4><p class="gwt">Every call logs API name, timestamp, status, error message, and reference key (templateCode / examCode / classCode).</p></div></div>
+      <div class="ac-item"><span class="ac-no">06</span><div><h4>Validation failure handling</h4><p class="gwt">Missing required fields, invalid <code>examTypeCd</code>, missing <code>templateCode</code>/<code>classType</code>, or a blocked exam delete all reject cleanly with no partial writes.</p></div></div>
+    </div>
+
+    <div class="flags">
+      <div class="flags-head"><span class="dot"></span><h3>Discussion flags for grooming</h3></div>
+      <ol>
+        <li><b>How do we tell an M-Rise-origin record apart from other sources once it's inside AMS?</b> Raised by the story's original author (Nguyen Bien Trung) and still open — needs a check with the AMS data-model owner before build. This is the one open item on an otherwise fully-approved story.<span class="who">Open</span></li>
+        <li><b>mitType = 'F' special case:</b> inserting a class with <code>mitType = F</code> makes AMS auto-create a linked sub-class (suffix <code>_C</code>, <code>mitType = C</code>) — confirm the team building <code>sync-class</code> is aware this isn't a 1-row-in-1-row-out API.<span class="who">Confirm build understanding</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ============ ORDER 2 ============ -->
+  <div class="panel" id="panel-order2">
+    <div class="order-head">
+      <span class="order-tag">02</span>
+      <h1>Sync Attendance, Exam Result &amp; Training Result</h1>
+    </div>
+    <div class="order-status">
+      <span class="status-chip">Approved</span>
+      <span class="status-chip count">3 APIs</span>
+      <span class="status-chip count">Depends on Order 1 · Blocks Orders 3, 4</span>
+    </div>
+
+    <div class="objective">
+      <span class="obj-label">Objective</span>
+      As <b>AMS System</b>, I want to receive candidate exam attendance/result and training-result information
+      from M-Rise, so AMS can record exam attendance &amp; result, class training result, candidate result,
+      education/license background, MOF approval, and CPA-result-sent status for Order 3/4 processing.
+    </div>
+
+    <div class="cols3">
+      <div class="flow-card">
+        <span class="flow-label">Trigger</span>
+        <ul>
+          <li>Candidate exam attendance/result recorded</li>
+          <li>Candidate training/class result finalized</li>
+          <li>Candidate result sent to the AP (CPA) system</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Pre-condition</span>
+        <ul>
+          <li>Order 1's class/exam/template shell exists</li>
+          <li><code>inform-cpa-result</code> requires <code>training-result/sync</code> to have already run for the same candidate</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Post-condition</span>
+        <ul>
+          <li>Attendance, result, education background, MOF decision stored</li>
+          <li>"Sent to AP" status reflected</li>
+          <li>Data ready for Order 3</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.15rem; margin-bottom:14px;">Acceptance criteria</h2>
+    <div class="ac-list">
+      <div class="ac-item"><span class="ac-no">01</span><div><h4>Sync exam attendance &amp; result</h4><p class="gwt">Insert-or-update by <code>(EXAM_MASTER_CD, CLASS_CD, CAN_NUM)</code> — no <code>action</code> field, existence check decides insert vs. update; no duplicates on re-sync.</p></div></div>
+      <div class="ac-item"><span class="ac-no">02</span><div><h4>Sync training result</h4><p class="gwt">Insert/update <code>TAMS_TRAINING_RSLTS</code> always; if <code>isMIT</code>, also write candidate result + education background; if not MIT but <code>hasLDPLicense</code>, education background only; MOF fields update independently whenever present.</p></div></div>
+      <div class="ac-item"><span class="ac-no">03</span><div><h4>Inform CPA result</h4><p class="gwt">Locate the candidate-result row and set its "sent to AP" flag; re-sending the same (classCode, candidateNum) is idempotent and does not error.</p></div></div>
+      <div class="ac-item"><span class="ac-no">04</span><div><h4>Integration must go through Learning Adapter</h4><p class="gwt">Same enforcement as Order 1 — no direct M-Rise → AMS calls for any of the 3 APIs.</p></div></div>
+      <div class="ac-item"><span class="ac-no">05</span><div><h4>Error handling &amp; logging</h4><p class="gwt">Every call logs API name, timestamp, status, error, and reference key (classCode, canNum/candidateNum, examCode).</p></div></div>
+      <div class="ac-item"><span class="ac-no">06</span><div><h4>Validation failure handling</h4><p class="gwt">Missing required fields, missing Order 1 parent data, an incomplete MIT payload, or a duplicate education-background insert all reject or no-op cleanly — never a partial write.</p></div></div>
+    </div>
+
+    <div class="flags">
+      <div class="flags-head"><span class="dot"></span><h3>Discussion flags for grooming</h3></div>
+      <ol>
+        <li><b>Order placement of <code>inform-cpa-result/sync</code>:</b> BA initially flagged this as possibly Order-3-adjacent. PO ruled it stays in Order 2 — it only flips a status flag on a row that Order 2 itself creates, with no Order 3 dependency. Worth a quick team sanity-check, not a re-litigation.<span class="who">PO decision — confirm understanding</span></li>
+        <li><b>The "sent to AP" column name on <code>TAMS_CANDIDATE_RSLTS</code> is not in the source workbook</b> — assumed to be a <code>SEND_TO_AP</code>-style flag. Needs a DDL/data-dictionary lookup before dev estimates R.03.<span class="who">Open — blocks estimation</span></li>
+        <li><b>isMIT = true but a required sub-object is missing from the payload:</b> PO approved fail-fast (reject the whole request) over a partial write. Revisit only if M-Rise's client team confirms a real phased-submission use case.<span class="who">PO decision</span></li>
+        <li><b>When both <code>isMIT</code> and <code>hasLDPLicense</code> are false</b> — are the sub-objects omitted entirely, or sent null/empty? Affects request-schema validation; needs confirmation from the M-Rise API client owner.<span class="who">Open</span></li>
+        <li><b>Order 1 existence checks (classCode/examCode must already exist)</b> are engineering inferences, not sourced validation rows — approved as default build behavior, but flag for SIT verification against real AMS behavior.<span class="who">Confirm in SIT</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ============ ORDER 3 ============ -->
+  <div class="panel" id="panel-order3">
+    <div class="order-head">
+      <span class="order-tag">03</span>
+      <h1>License Eligibility, Grant &amp; Plan Code</h1>
+    </div>
+    <div class="order-status">
+      <span class="status-chip">Approved</span>
+      <span class="status-chip count">5 APIs</span>
+      <span class="status-chip count">Depends on Order 2 · Blocks Order 4</span>
+    </div>
+
+    <div class="objective">
+      <span class="obj-label">Objective</span>
+      As <b>AMS System</b>, I want to receive license-eligibility, license-grant, and plan-code assignment/refresh
+      information from M-Rise, so AMS can determine whether a candidate qualifies for a license, record the
+      granted license/education background, and maintain the agent's product plan codes for Order 4.
+    </div>
+
+    <div class="cols3">
+      <div class="flow-card">
+        <span class="flow-label">Trigger</span>
+        <ul>
+          <li>License-grant eligibility needs checking</li>
+          <li>A result qualifies a candidate and M-Rise finalizes the grant</li>
+          <li>A plan code needs assigning (new) or refreshing (expiry/status)</li>
+          <li>MIT candidate license/education needs updating</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Pre-condition</span>
+        <ul>
+          <li>Order 2's education background / candidate data exists</li>
+          <li><code>plancode/refresh</code> requires the target row to already exist — it only updates, never inserts</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Post-condition</span>
+        <ul>
+          <li>Eligibility flags, granted license, AWS cert housekeeping reflected</li>
+          <li>Plan codes assigned/refreshed with no duplicates</li>
+          <li>Data ready for Order 4</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.15rem; margin-bottom:14px;">Acceptance criteria</h2>
+    <div class="ac-list">
+      <div class="ac-item"><span class="ac-no">01</span><div><h4>Check license-grant conditions</h4><p class="gwt">Read-only despite the POST verb — evaluates eligibility per education type (UL/ULC/PENSION) and returns a true/false map; never writes to AMS.</p></div></div>
+      <div class="ac-item"><span class="ac-no">02</span><div><h4>Refresh plan code</h4><p class="gwt">Update-only on <code>(AGT_CD, PLAN_CD)</code> — if the row doesn't already exist, AMS must not insert one.</p></div></div>
+      <div class="ac-item"><span class="ac-no">03</span><div><h4>Assign plan code</h4><p class="gwt">Insert a new <code>TAMS_AGT_PRODUCT_DTLS</code> row only if <code>(AGT_CD, PLAN_CD)</code> doesn't already exist — existence check is a hard build requirement (BR-012), not optional.</p></div></div>
+      <div class="ac-item"><span class="ac-no">04</span><div><h4>Grant license</h4><p class="gwt">Insert/update education background by <code>(CAN_NUM, EDU_TYP)</code>; archive prior MIT/ULC cert under an <code>_MVL</code> suffix when applicable; delete the old AWS e-cert record; conditionally update product code and MOF approval. Reports success/failure via <code>errorCode</code> in the response body, not an HTTP error.</p></div></div>
+      <div class="ac-item"><span class="ac-no">05</span><div><h4>Update MIT license</h4><p class="gwt">Insert a new education-background row only if <code>(CAN_NUM, EDU_TYP)</code> doesn't already exist (BR-012); maps <code>certDecNum</code>/<code>certDecDate</code> to the MOF approval fields.</p></div></div>
+      <div class="ac-item"><span class="ac-no">06</span><div><h4>Integration must go through Learning Adapter</h4><p class="gwt">Same enforcement as Orders 1–2, across all 5 APIs.</p></div></div>
+      <div class="ac-item"><span class="ac-no">07</span><div><h4>Error handling &amp; logging</h4><p class="gwt">Every call is logged, including <code>license/grant</code>'s soft-failure <code>errorCode</code> — it must still be treated as a failure for logging/alerting even though no exception is raised.</p></div></div>
+      <div class="ac-item"><span class="ac-no">08</span><div><h4>Validation failure handling</h4><p class="gwt">Missing required fields, a not-found plan-code row on refresh, or a duplicate re-sync on the two insert-only APIs all reject or no-op cleanly.</p></div></div>
+    </div>
+
+    <div class="flags">
+      <div class="flags-head"><span class="dot"></span><h3>Discussion flags for grooming</h3></div>
+      <ol>
+        <li><b>Two APIs (<code>plancode/assign</code>, <code>MIT-license/update</code>) were sourced as bare inserts with no existence check</b> — a real gap versus every other write API in this integration. PO made adding a defensive existence check a <b>hard build requirement (BR-012)</b>, not optional, because this is candidate-facing license/plan-code data with real compliance consequence if duplicated on a Learning Adapter retry. Team should confirm the idempotent-response contract (return success on redundant retry vs. hard reject) during dev.<span class="who">PO decision — dev must implement</span></li>
+        <li><b><code>MIT-license/update</code>'s field mapping looked shifted by one row in the source workbook</b> (certDecNum/certDecDate/certCateId → MOF fields didn't line up with their own descriptions). BA and BE independently converged on a corrected mapping, and PO approved building against the correction rather than the literal sheet, since it writes MOF (financial regulator) approval fields. Still needs workbook-owner confirmation.<span class="who">Open — build proceeds on corrected mapping</span></li>
+        <li><b><code>plancode/refresh</code> sets <code>STAT_CD</code> in its SQL but the request schema documents no <code>statusCode</code> input field.</b> Working assumption: AMS derives the status server-side. Confirm with the M-Rise API owner in SIT.<span class="who">Open — confirm in SIT</span></li>
+        <li><b><code>license/grant</code>'s soft-failure pattern</b> (<code>errorCode: SUCCESS/FAILED</code> in a 200-style response, not an HTTP reject) is genuinely different from every other API in this integration — make sure whoever builds logging/alerting for this story knows not to rely on HTTP status alone.<span class="who">Confirm build understanding</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ============ ORDER 4 ============ -->
+  <div class="panel" id="panel-order4">
+    <div class="order-head">
+      <span class="order-tag">04</span>
+      <h1>Save &amp; Retrieve E-Certificate</h1>
+    </div>
+    <div class="order-status">
+      <span class="status-chip">Approved</span>
+      <span class="status-chip count">2 APIs · 1 write + 1 read</span>
+      <span class="status-chip count">Depends on Orders 2 &amp; 3 · Final Order</span>
+    </div>
+
+    <div class="objective">
+      <span class="obj-label">Objective</span>
+      As <b>AMS System</b>, I want to receive and record an agent's e-certificate document reference from M-Rise —
+      and as <b>Learning Adapter</b>, I want to retrieve an agent's e-certificate eligibility and delivery
+      configuration from AMS — so M-Rise can generate or (re-)deliver the correct certificate. The only Order in
+      this integration with both a write and a read direction.
+    </div>
+
+    <div class="cols3">
+      <div class="flow-card">
+        <span class="flow-label">Trigger</span>
+        <ul>
+          <li>E-certificate document generated/uploaded on M-Rise (save)</li>
+          <li>Eligibility/delivery-config lookup needed (get)</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Pre-condition</span>
+        <ul>
+          <li>Order 2 PASS training result exists</li>
+          <li>Order 3 active license/education record exists</li>
+          <li>No existing active matching cert (for save)</li>
+        </ul>
+      </div>
+      <div class="flow-card">
+        <span class="flow-label">Post-condition</span>
+        <ul>
+          <li>New housekeeping row saved, or a 406/404 rejection</li>
+          <li>Get returns eligibility + (partial) delivery data</li>
+          <li>Every call logged</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 style="font-size:1.15rem; margin-bottom:14px;">Acceptance criteria</h2>
+    <div class="ac-list">
+      <div class="ac-item"><span class="ac-no">01</span><div><h4>Save e-certificate</h4><p class="gwt">Reject <code>406</code> if an active matching cert already exists; reject <code>404</code> if the agent isn't eligible (no PASS result / no active license); otherwise insert, sourcing agent/education fields via join.</p></div></div>
+      <div class="ac-item"><span class="ac-no">02</span><div><h4>Retrieve e-certificate information</h4><p class="gwt">Read-only lookup by <code>licNo</code> + <code>agtCode</code>; returns education-background data now, delivery-configuration data once its schema is confirmed (see flags).</p></div></div>
+      <div class="ac-item"><span class="ac-no">03</span><div><h4>Integration must go through Learning Adapter</h4><p class="gwt">Applies in both directions — save and get.</p></div></div>
+      <div class="ac-item"><span class="ac-no">04</span><div><h4>Error handling &amp; logging</h4><p class="gwt">Logs include the <code>returnCode</code> for save's 406/404 business-rejection cases, not just hard errors.</p></div></div>
+      <div class="ac-item"><span class="ac-no">05</span><div><h4>Validation failure handling</h4><p class="gwt">Missing required fields reject on both APIs; an ineligible agent on get returns an empty result rather than erroring — deliberately different from save's explicit reject.</p></div></div>
+    </div>
+
+    <div class="flags">
+      <div class="flags-head"><span class="dot"></span><h3>Discussion flags for grooming</h3></div>
+      <ol>
+        <li><b>The get endpoint's delivery-configuration response (<code>cas.tdelivery_settings_dtls</code> / <code>tdoc_settings</code>) has no field list anywhere in source.</b> PO ruled the team should not invent one. This is a <b>scoped pre-build blocker on that sub-piece only</b> — the education-background half of the same API is fully specified and can proceed now. Needs the DDL from the workbook owner before that part can be built.<span class="who">Open — blocks one response sub-piece</span></li>
+        <li><b>Two distinct rejection codes were needed for save</b> (duplicate cert vs. agent-not-eligible) so Learning Adapter's retry logic doesn't conflate them. Source only documented <code>406</code>; PO assigned <code>404</code> for the not-eligible case. Confirm against the actual M-Rise/AMS API-owner convention in SIT — it may need to change.<span class="who">PO decision — confirm in SIT</span></li>
+        <li><b>Why does get silently return empty for an ineligible agent while save explicitly rejects?</b> This is deliberate, not an inconsistency — a query with nothing to return shouldn't error, but a write with nothing to source shouldn't insert null housekeeping fields. Worth stating out loud in grooming so QA writes test cases for both behaviors correctly.<span class="who">Confirm build understanding</span></li>
+        <li><b><code>LIC_STAT_CD</code> is filtered on in the save existence-check but never introduced as a real field anywhere in the doc</b> — same pattern as Order 3's <code>STAT_CD</code> gap. Working assumption: a fixed/derived value, not client-supplied. Confirm against the stored procedure/DDL during dev.<span class="who">Open — confirm in dev</span></li>
+      </ol>
+    </div>
+  </div>
+
+</main>
+
+<footer class="note">
+  Source: <span class="mono">MRISE_PROJECT/US_DOCUMENT/US1.md–US4.md</span> (all approved 2026-07-13/14) ·
+  Drafted by the BA persona per <span class="mono">SQUAD_TEAM/BA.md</span> for backlog grooming — condensed from
+  the full requirement docs; refer back to the source US files for complete field mappings, sample payloads, and
+  business-rule detail during implementation.
+</footer>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll(".tab-btn");
+    var panels = document.querySelectorAll(".panel");
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var target = btn.getAttribute("data-tab");
+        buttons.forEach(function (b) { b.setAttribute("aria-selected", String(b === btn)); });
+        panels.forEach(function (p) {
+          p.classList.toggle("active", p.id === "panel-" + target);
+        });
+        window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+      });
+    });
+  })();
+</script>
