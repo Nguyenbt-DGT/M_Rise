@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Demo UAT — M-Rise</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #f0eee7;
+    --ink: #1c2321;
+    --ink-soft: #4b554f;
+    --ink-faint: #7c8680;
+    --accent: #0f6e5c;
+    --line: #dcd9ce;
+    --line-strong: #c4c0b2;
+    --mrise: #3d5a80; --mrise-soft: #e7ecf5; --mrise-line: #c3d0e3;
+    --mpa: #0f6e5c; --mpa-soft: #e3efea; --mpa-line: #bcd8cd;
+    --cas: #9a6a1f; --cas-soft: #fbf1de; --cas-line: #e8cf9d;
+    --shadow: 0 1px 2px rgba(28, 35, 33, 0.06), 0 8px 24px -12px rgba(28, 35, 33, 0.18);
+    --radius: 14px;
+    --serif: Iowan Old Style, Palatino Linotype, Palatino, Georgia, "Noto Serif", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --accent-num-ink: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12181a; --surface: #182120; --surface-2: #1e2827; --ink: #e9ede9; --ink-soft: #a8b3ac;
+      --ink-faint: #778078; --accent: #3fbd9e; --line: #2a3634; --line-strong: #3a4846;
+      --mrise: #93aad4; --mrise-soft: #232c3d; --mrise-line: #3a4560;
+      --mpa: #3fbd9e; --mpa-soft: #17302b; --mpa-line: #2a4a41;
+      --cas: #e6b465; --cas-soft: #2c2312; --cas-line: #4a3a1c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+      --accent-num-ink: #08201a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12181a; --surface: #182120; --surface-2: #1e2827; --ink: #e9ede9; --ink-soft: #a8b3ac;
+    --ink-faint: #778078; --accent: #3fbd9e; --line: #2a3634; --line-strong: #3a4846;
+    --mrise: #93aad4; --mrise-soft: #232c3d; --mrise-line: #3a4560;
+    --mpa: #3fbd9e; --mpa-soft: #17302b; --mpa-line: #2a4a41;
+    --cas: #e6b465; --cas-soft: #2c2312; --cas-line: #4a3a1c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+    --accent-num-ink: #08201a;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f5f1; --surface: #ffffff; --surface-2: #f0eee7; --ink: #1c2321; --ink-soft: #4b554f;
+    --ink-faint: #7c8680; --accent: #0f6e5c; --line: #dcd9ce; --line-strong: #c4c0b2;
+    --mrise: #3d5a80; --mrise-soft: #e7ecf5; --mrise-line: #c3d0e3;
+    --mpa: #0f6e5c; --mpa-soft: #e3efea; --mpa-line: #bcd8cd;
+    --cas: #9a6a1f; --cas-soft: #fbf1de; --cas-line: #e8cf9d;
+    --shadow: 0 1px 2px rgba(28, 35, 33, 0.06), 0 8px 24px -12px rgba(28, 35, 33, 0.18);
+    --accent-num-ink: #ffffff;
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; text-wrap: balance; margin: 0; color: var(--ink); }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar-inner {
+    max-width: 1000px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; gap: 22px; flex-wrap: wrap;
+  }
+  .brand { display: flex; flex-direction: column; gap: 1px; margin-right: auto; }
+  .brand .name { font-family: var(--serif); font-size: 1.05rem; font-weight: 700; }
+  .brand .sub { font-size: 0.74rem; color: var(--ink-faint); }
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tab-btn {
+    font-family: var(--sans); font-size: 0.86rem; font-weight: 600; color: var(--ink-soft);
+    background: transparent; border: 1px solid transparent; border-radius: 999px;
+    padding: 7px 16px; cursor: pointer; white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--ink); background: var(--surface-2); }
+  .tab-btn[aria-selected="true"] { background: var(--accent); color: var(--accent-num-ink); border-color: var(--accent); }
+  .tab-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 96px; }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fade 0.18s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .panel.active { animation: none; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .eyebrow {
+    font-family: var(--sans); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em;
+    text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--accent); }
+
+  header.hero { padding-bottom: 30px; border-bottom: 1px solid var(--line); margin-bottom: 34px; max-width: 720px; }
+  header.hero h1 { font-size: clamp(24px, 4vw, 32px); margin-bottom: 12px; max-width: 26ch; }
+  header.hero p { color: var(--ink-soft); font-size: 1rem; margin: 0; max-width: 62ch; }
+  .hero-meta { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 18px; font-size: 0.84rem; color: var(--ink-faint); }
+  .hero-meta b { color: var(--ink-soft); font-weight: 700; }
+
+  /* ---- flow panel ---- */
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px; font-size: 0.84rem; font-weight: 600;
+    padding: 6px 14px 6px 10px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .legend-item.mrise { color: var(--mrise); border-color: var(--mrise-line); background: var(--mrise-soft); }
+  .legend-item.mpa { color: var(--mpa); border-color: var(--mpa-line); background: var(--mpa-soft); }
+  .legend-item.cas { color: var(--cas); border-color: var(--cas-line); background: var(--cas-soft); }
+  .legend-item.mrise .legend-dot { background: var(--mrise); }
+  .legend-item.mpa .legend-dot { background: var(--mpa); }
+  .legend-item.cas .legend-dot { background: var(--cas); }
+
+  .diagram-card {
+    position: relative;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 10px;
+  }
+  .diagram-viewport {
+    position: relative; overflow: hidden;
+    height: clamp(380px, 62vh, 680px);
+    border-radius: calc(var(--radius) - 4px);
+    background: var(--surface-2);
+    touch-action: none;
+  }
+  .diagram-viewport pre.mermaid { margin: 0; width: 100%; height: 100%; }
+  .diagram-viewport svg { display: block; width: 100%; height: 100%; }
+  .diagram-viewport .nodeLabel,
+  .diagram-viewport foreignObject div { line-height: 1.3; white-space: normal; }
+  .diagram-viewport foreignObject { overflow: visible; }
+  .diagram-viewport:fullscreen { height: 100vh; border-radius: 0; background: var(--bg); }
+  .diagram-viewport:-webkit-full-screen { height: 100vh; border-radius: 0; background: var(--bg); }
+
+  .diagram-toolbar {
+    position: absolute; top: 22px; right: 22px; z-index: 6;
+    display: flex; gap: 6px; padding: 5px;
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow);
+  }
+  .zoom-btn {
+    width: 30px; height: 30px; flex: none; display: flex; align-items: center; justify-content: center;
+    font-family: var(--sans); font-size: 1rem; font-weight: 600; line-height: 1;
+    color: var(--ink-soft); background: transparent; border: 1px solid transparent; border-radius: 7px;
+    cursor: pointer;
+  }
+  .zoom-btn:hover { color: var(--ink); background: var(--surface-2); border-color: var(--line); }
+  .zoom-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .zoom-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+  .diagram-hint {
+    text-align: center; font-size: 0.76rem; color: var(--ink-faint); margin-top: 10px;
+  }
+
+  /* ---- presenter panel ---- */
+  section { margin-bottom: 42px; }
+  .section-label { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .section-label .num {
+    flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent);
+    color: var(--accent-num-ink); font-family: var(--serif); font-size: 0.82rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .section-label h2 { font-size: 1.15rem; }
+  .section-sub { color: var(--ink-faint); font-size: 0.86rem; margin: 4px 0 0 36px; }
+
+  .checklist {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 6px 4px;
+  }
+  .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .check-item:last-child { border-bottom: none; }
+  .check-item input[type="checkbox"] { flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); cursor: pointer; }
+  .check-item label { font-size: 0.92rem; cursor: pointer; }
+  .app-chip {
+    display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.02em;
+    padding: 1px 8px; border-radius: 999px; margin-right: 8px; vertical-align: 1px;
+  }
+  .app-chip.mrise { background: var(--mrise-soft); color: var(--mrise); border: 1px solid var(--mrise-line); }
+  .app-chip.mpa { background: var(--mpa-soft); color: var(--mpa); border: 1px solid var(--mpa-line); }
+  .app-chip.cas { background: var(--cas-soft); color: var(--cas); border: 1px solid var(--cas-line); }
+
+  .live-step {
+    position: relative; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 22px; margin-bottom: 16px;
+  }
+  .live-step-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .live-step-head .step-no {
+    flex: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-family: var(--serif); font-weight: 700; font-size: 1rem; color: var(--accent-num-ink);
+  }
+  .live-step.mrise .step-no { background: var(--mrise); }
+  .live-step.mpa .step-no { background: var(--mpa); }
+  .live-step.cas .step-no { background: var(--cas); }
+  .live-step-head h3 { font-size: 1.08rem; }
+
+  .block-label {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+    color: var(--ink-faint); margin: 14px 0 6px;
+  }
+  .block-label:first-of-type { margin-top: 0; }
+  .live-step ul.do-list { margin: 0; padding-left: 1.15em; }
+  .live-step ul.do-list li { font-size: 0.92rem; margin-bottom: 5px; color: var(--ink); }
+  .live-step ul.do-list li:last-child { margin-bottom: 0; }
+
+  .say-box {
+    background: var(--surface-2); border-left: 3px solid var(--line-strong); border-radius: 0 8px 8px 0;
+    padding: 12px 14px; font-family: var(--serif); font-style: italic; font-size: 0.94rem; color: var(--ink-soft);
+  }
+  .emph-box { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; font-size: 0.86rem; color: var(--ink-soft); }
+  .emph-box .mark { flex: none; color: var(--accent); font-weight: 700; }
+
+  .arrow-down {
+    display: flex; justify-content: center; margin: -6px 0 10px;
+    color: var(--ink-faint); font-size: 0.78rem; font-weight: 600; gap: 6px; align-items: center;
+  }
+
+  footer.note {
+    max-width: 1000px; margin: 8px auto 0; padding: 20px 24px 0; border-top: 1px solid var(--line);
+    color: var(--ink-faint); font-size: 0.8rem;
+  }
+
+  @media (max-width: 560px) {
+    main { padding: 32px 16px 72px; }
+  }
+  @media print {
+    .topbar { display: none; }
+    .live-step, .checklist { box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="name">Demo UAT — M-Rise</span>
+      <span class="sub">Hành trình ứng viên MIT · M-Rise → MPA → CAS</span>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Danh mục">
+      <button class="tab-btn" role="tab" data-tab="flow" aria-selected="true">Luồng demo (Business)</button>
+      <button class="tab-btn" role="tab" data-tab="presenter" aria-selected="false">Kịch bản Present</button>
+    </nav>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ PANEL: FLOW (BUSINESS USER) ============ -->
+  <div class="panel active" id="panel-flow">
+    <header class="hero">
+      <div class="eyebrow">Demo UAT · dành cho business user</div>
+      <h1>Hành trình của một ứng viên MIT — từ đăng ký đến kích hoạt</h1>
+      <p>
+        Sơ đồ dưới đây nhóm các bước theo từng app (khung màu), và vẽ mũi tên thật cho mỗi lần
+        demo chuyển từ app này sang app khác — theo đúng thứ tự sẽ trình diễn.
+      </p>
+      <div class="legend">
+        <div class="legend-item mrise"><span class="legend-dot"></span>M-Rise — quản trị đào tạo</div>
+        <div class="legend-item mpa"><span class="legend-dot"></span>MPA — recruiter &amp; ứng viên</div>
+        <div class="legend-item cas"><span class="legend-dot"></span>CAS — kích hoạt mã</div>
+      </div>
+    </header>
+
+    <div class="diagram-card">
+      <div class="diagram-toolbar" role="toolbar" aria-label="Điều khiển phóng to / thu nhỏ sơ đồ">
+        <button type="button" class="zoom-btn" id="zoom-out" title="Thu nhỏ" aria-label="Thu nhỏ">−</button>
+        <button type="button" class="zoom-btn" id="zoom-reset" title="Vừa khung hình" aria-label="Vừa khung hình">
+          <svg viewBox="0 0 24 24"><path d="M9 3H4v5M15 3h5v5M9 21H4v-5M15 21h5v-5"/></svg>
+        </button>
+        <button type="button" class="zoom-btn" id="zoom-in" title="Phóng to" aria-label="Phóng to">+</button>
+        <button type="button" class="zoom-btn" id="zoom-fullscreen" title="Toàn màn hình" aria-label="Toàn màn hình">
+          <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+      </div>
+      <div class="diagram-viewport" id="diagram-viewport">
+<pre class="mermaid" id="flow-diagram"></pre>
+      </div>
+    </div>
+    <div class="diagram-hint">Kéo để di chuyển · cuộn hoặc bấm +/− để phóng to, thu nhỏ · ⛶ để xem toàn màn hình</div>
+
+    <footer class="note">
+      Nguồn: <code>MRISE_PROJECT/DOCUMENT_REFER/Script_UAT_DEMO.xlsx</code> ·
+      Bản rút gọn dành cho trình bày với business user, vẽ dưới dạng flow chart theo từng ứng dụng.
+    </footer>
+  </div>
+
+  <!-- ============ PANEL: PRESENTER SCRIPT ============ -->
+  <div class="panel" id="panel-presenter">
+    <header class="hero">
+      <div class="eyebrow">Cue card · dành cho người present</div>
+      <h1>Kịch bản trình bày Demo UAT — hành trình ứng viên MIT</h1>
+      <p>Dùng tab này khi đứng present trực tiếp: phần 1 là danh sách kiểm tra trước giờ demo,
+      phần 2 là trình tự thao tác kèm câu gợi ý để nói với business user ở từng bước.</p>
+      <div class="hero-meta">
+        <span><b>Người trình bày:</b> Nguyên</span>
+        <span><b>Số bước live:</b> 5 (M-Rise → MPA → CAS)</span>
+        <span><b>Nguồn:</b> Script_UAT_DEMO.xlsx</span>
+      </div>
+    </header>
+
+    <section>
+      <div class="section-label"><span class="num">1</span><h2>Trước khi bắt đầu</h2></div>
+      <p class="section-sub">Các phần này chạy nền trên M-Rise — không demo trực tiếp, nhưng phải xác nhận đã xong trước khi mời business user vào phòng.</p>
+      <div class="checklist">
+        <div class="check-item">
+          <input type="checkbox" id="c1" />
+          <label for="c1"><span class="app-chip mrise">M-RISE</span>Lớp MIT non-exp đã được tạo và gắn vào roadmap, sẵn sàng để MPA đăng ký vào.</label>
+        </div>
+        <div class="check-item">
+          <input type="checkbox" id="c2" />
+          <label for="c2"><span class="app-chip mrise">M-RISE</span>Tài khoản ứng viên demo đăng nhập thử được, xem đúng roadmap lớp MIT non-exp.</label>
+        </div>
+        <div class="check-item">
+          <input type="checkbox" id="c3" />
+          <label for="c3"><span class="app-chip mrise">M-RISE</span>Mã đề thi (exam code) đã gán cho lớp; tài khoản điểm danh đã ở trạng thái thành công.</label>
+        </div>
+        <div class="check-item">
+          <input type="checkbox" id="c4" />
+          <label for="c4"><span class="app-chip mrise">M-RISE</span>Kết quả thi từ VIDI đã được nhập sẵn cho ứng viên demo (vai trò admin).</label>
+        </div>
+        <div class="check-item">
+          <input type="checkbox" id="c5" />
+          <label for="c5">Tài khoản recruiter trên MPA đã đăng nhập sẵn trên máy trình chiếu; đã thử chuyển cửa sổ giữa M-Rise / MPA / CAS mượt.</label>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-label"><span class="num">2</span><h2>Trình tự trình bày trực tiếp</h2></div>
+      <p class="section-sub">Đọc trước phần "Nói" để chuyển sang ngôn ngữ tự nhiên của mình — đây chỉ là gợi ý, không phải lời thoại bắt buộc.</p>
+
+      <div class="live-step mrise">
+        <div class="live-step-head">
+          <span class="step-no">1</span>
+          <div><h3>Mở lớp MIT trên M-Rise, đối chiếu dữ liệu vừa load sang MPA</h3><span class="app-chip mrise">M-RISE</span></div>
+        </div>
+        <div class="block-label">Làm</div>
+        <ul class="do-list">
+          <li>Mở M-Rise, chỉ nhanh vào lớp MIT non-exp đã tạo sẵn (đã set up trước giờ demo, không tạo lại từ đầu)</li>
+          <li>Chuyển sang MPA, cho thấy lớp này đã xuất hiện trong danh sách để đăng ký</li>
+        </ul>
+        <div class="block-label">Nói</div>
+        <div class="say-box">"Trước buổi demo mình đã tạo sẵn lớp MIT non-exp này trên M-Rise và gắn vào roadmap. Ngay khi tạo xong, dữ liệu lớp được đồng bộ xuống MPA — nên giờ mình sẽ thấy lớp này xuất hiện sẵn khi đăng ký ứng viên bên MPA."</div>
+        <div class="emph-box"><span class="mark">→</span>Nhấn mạnh: đây là điểm nối đầu tiên giữa hai hệ thống — lớp được tạo ở M-Rise, nhưng việc đăng ký ứng viên lại thao tác bên MPA nhờ dữ liệu đã đồng bộ sẵn, không cần nhập tay lại.</div>
+      </div>
+
+      <div class="live-step mpa">
+        <div class="live-step-head">
+          <span class="step-no">2</span>
+          <div><h3>Recruiter thêm &amp; đăng ký ứng viên vào lớp MIT</h3><span class="app-chip mpa">MPA</span></div>
+        </div>
+        <div class="block-label">Làm</div>
+        <ul class="do-list">
+          <li>Recruiter thêm ứng viên mới</li>
+          <li>Chọn lớp MIT vừa thấy (đã đồng bộ từ M-Rise) cho ứng viên</li>
+          <li>Ứng viên xác nhận tham gia</li>
+          <li>UM phê duyệt</li>
+          <li>Đăng ký lớp MIT thành công</li>
+        </ul>
+        <div class="block-label">Nói</div>
+        <div class="say-box">"Mình sẽ đóng vai recruiter, thêm một ứng viên mới và đăng ký vào đúng lớp MIT vừa mở bên M-Rise — cả quy trình duyệt chỉ diễn ra trong vài bước trên MPA."</div>
+        <div class="emph-box"><span class="mark">→</span>Nhấn mạnh: ngay sau khi đăng ký thành công, ứng viên nhận email kèm tài khoản M-Rise để bắt đầu học — không cần ai tạo tài khoản thủ công.</div>
+      </div>
+
+      <div class="arrow-down">◆ ◆ ◆ (phần học &amp; thi diễn ra nền trên M-Rise, không demo lại) ◆ ◆ ◆</div>
+
+      <div class="live-step mpa">
+        <div class="live-step-head">
+          <span class="step-no">3</span>
+          <div><h3>Recruiter theo dõi tiến độ ứng viên</h3><span class="app-chip mpa">MPA</span></div>
+        </div>
+        <div class="block-label">Làm</div>
+        <ul class="do-list">
+          <li>Đăng nhập recruiter trên MPA</li>
+          <li>Mở hồ sơ ứng viên, xem đã có kết quả học MIT chưa</li>
+        </ul>
+        <div class="block-label">Nói</div>
+        <div class="say-box">"Bây giờ quay lại vai trò recruiter — kiểm tra xem ứng viên mình vừa đăng ký đã có kết quả học tập chưa. Dữ liệu này được đồng bộ trực tiếp từ M-Rise."</div>
+        <div class="emph-box"><span class="mark">→</span>Nhấn mạnh: recruiter không cần hỏi phòng đào tạo, tự theo dõi được tiến độ ngay trên MPA.</div>
+      </div>
+
+      <div class="arrow-down">◆ ◆ ◆ (kết quả thi từ VIDI đã được nhập sẵn trên M-Rise) ◆ ◆ ◆</div>
+
+      <div class="live-step mpa">
+        <div class="live-step-head">
+          <span class="step-no">4</span>
+          <div><h3>Xác nhận hoàn thành khóa học &amp; đồng bộ dữ liệu</h3><span class="app-chip mpa">MPA</span></div>
+        </div>
+        <div class="block-label">Làm</div>
+        <ul class="do-list">
+          <li>Recruiter đăng nhập, xem ứng viên đã hoàn thành thành công khóa MIT</li>
+          <li>Kiểm tra file AVICAD trên MPA</li>
+          <li>Sync dữ liệu xuống CAS để chuẩn bị cấp mã</li>
+        </ul>
+        <div class="block-label">Nói</div>
+        <div class="say-box">"Ứng viên đã hoàn thành khóa MIT. Trước khi cấp mã đại lý, hệ thống sẽ kiểm tra file AVICAD ngay trên MPA, sau đó đồng bộ dữ liệu này xuống CAS."</div>
+        <div class="emph-box"><span class="mark">→</span>Nhấn mạnh: đây là bước bản lề — dữ liệu học tập chỉ được đẩy sang CAS sau khi file AVICAD hợp lệ, đảm bảo không cấp mã sai người.</div>
+      </div>
+
+      <div class="live-step cas">
+        <div class="live-step-head">
+          <span class="step-no">5</span>
+          <div><h3>Kích hoạt mã đại lý</h3><span class="app-chip cas">CAS</span></div>
+        </div>
+        <div class="block-label">Làm</div>
+        <ul class="do-list">
+          <li>Mở CAS</li>
+          <li>Demo màn hình nghiệp vụ để nạp mã agent cho ứng viên</li>
+        </ul>
+        <div class="block-label">Nói</div>
+        <div class="say-box">"Bước cuối cùng — dữ liệu vừa đồng bộ từ MPA giờ xuất hiện trên CAS, mình chỉ cần nạp mã và ứng viên chính thức trở thành agent."</div>
+        <div class="emph-box"><span class="mark">→</span>Nhấn mạnh: đây là điểm kết thúc hành trình — từ một ứng viên mới đến khi có mã đại lý chính thức, không có bước nhập liệu thủ công nào giữa 3 hệ thống.</div>
+      </div>
+    </section>
+
+    <footer class="note">
+      Nguồn: <code>MRISE_PROJECT/DOCUMENT_REFER/Script_UAT_DEMO.xlsx</code> ·
+      Xem bản kể chuyện cho business user ở tab "Luồng demo (Business)".
+    </footer>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+<script>
+  (function () {
+    var palettes = {
+      light: {
+        ink: "#1c2321", inkFaint: "#7c8680", surface: "#ffffff", surface2: "#f0eee7", line: "#dcd9ce",
+        mrise: "#3d5a80", mriseSoft: "#e7ecf5", mriseLine: "#c3d0e3",
+        mpa: "#0f6e5c", mpaSoft: "#e3efea", mpaLine: "#bcd8cd",
+        cas: "#9a6a1f", casSoft: "#fbf1de", casLine: "#e8cf9d"
+      },
+      dark: {
+        ink: "#e9ede9", inkFaint: "#778078", surface: "#182120", surface2: "#1e2827", line: "#2a3634",
+        mrise: "#93aad4", mriseSoft: "#232c3d", mriseLine: "#3a4560",
+        mpa: "#3fbd9e", mpaSoft: "#17302b", mpaLine: "#2a4a41",
+        cas: "#e6b465", casSoft: "#2c2312", casLine: "#4a3a1c"
+      }
+    };
+
+    function buildDiagram(p) {
+      return [
+        '%%{init: {',
+        '  "theme": "base",',
+        '  "themeVariables": {',
+        '    "fontFamily": "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif",',
+        '    "fontSize": "15px",',
+        '    "lineColor": "' + p.inkFaint + '",',
+        '    "primaryColor": "' + p.surface + '",',
+        '    "primaryTextColor": "' + p.ink + '",',
+        '    "primaryBorderColor": "' + p.line + '",',
+        '    "clusterBkg": "' + p.surface2 + '",',
+        '    "clusterBorder": "' + p.line + '",',
+        '    "edgeLabelBackground": "' + p.surface + '"',
+        '  },',
+        '  "flowchart": { "curve": "basis", "nodeSpacing": 55, "rankSpacing": 80, "padding": 22, "htmlLabels": true } ',
+        '}}%%',
+        "flowchart TD",
+        '    subgraph MRISE["M-Rise — Quản trị đào tạo"]',
+        "        direction TB",
+        '        A1["1 · Mở lớp đào tạo mới"]',
+        '        A3["3 · Ứng viên bắt đầu học"]',
+        '        A5["5 · Ghi nhận kết quả thi"]',
+        "    end",
+        "",
+        '    subgraph MPA["MPA — Recruiter và ứng viên"]',
+        "        direction TB",
+        '        B2["2 · Ứng viên đăng ký tham gia<br/>thêm ứng viên → chọn lớp<br/>xác nhận → phê duyệt"]',
+        '        B4["4 · Theo dõi tiến độ ứng viên"]',
+        '        B6["6 · Xác nhận hoàn thành khóa học<br/>Kiểm tra file AVICAD trên MPA"]',
+        "    end",
+        "",
+        '    subgraph CAS["CAS — Kích hoạt mã"]',
+        "        direction TB",
+        '        C7["7 · Kích hoạt mã đại lý"]',
+        "    end",
+        "",
+        '    A1 -- "tạo lớp xong → dữ liệu lớp load lên MPA" --> B2',
+        '    B2 -- "nhận tài khoản qua email" --> A3',
+        '    A3 -- "điểm danh xong" --> B4',
+        '    B4 -- "chưa có kết quả" --> A5',
+        '    A5 -- "kết quả đã nhập" --> B6',
+        '    B6 -- "file AVICAD hợp lệ — sync dữ liệu xuống CAS" --> C7',
+        "",
+        "    classDef mriseNode fill:" + p.mriseSoft + ",stroke:" + p.mrise + ",stroke-width:1.4px,color:" + p.ink + ",rx:10,ry:10",
+        "    classDef mpaNode fill:" + p.mpaSoft + ",stroke:" + p.mpa + ",stroke-width:1.4px,color:" + p.ink + ",rx:10,ry:10",
+        "    classDef casNode fill:" + p.casSoft + ",stroke:" + p.cas + ",stroke-width:1.4px,color:" + p.ink + ",rx:10,ry:10",
+        "    class A1,A3,A5 mriseNode",
+        "    class B2,B4,B6 mpaNode",
+        "    class C7 casNode",
+        "",
+        "    style MRISE fill:" + p.surface2 + ",stroke:" + p.mriseLine + ",stroke-width:1.2px,color:" + p.mrise + ",rx:14,ry:14",
+        "    style MPA fill:" + p.surface2 + ",stroke:" + p.mpaLine + ",stroke-width:1.2px,color:" + p.mpa + ",rx:14,ry:14",
+        "    style CAS fill:" + p.surface2 + ",stroke:" + p.casLine + ",stroke-width:1.2px,color:" + p.cas + ",rx:14,ry:14",
+        "",
+        "    linkStyle default stroke:" + p.inkFaint + ",stroke-width:1.6px"
+      ].join("\n");
+    }
+
+    var mql = window.matchMedia("(prefers-color-scheme: dark)");
+    var el = document.getElementById("flow-diagram");
+    var viewport = document.getElementById("diagram-viewport");
+    var renderCount = 0;
+    var panZoomInstance = null;
+
+    mermaid.initialize({ startOnLoad: false, securityLevel: "loose" });
+
+    function render() {
+      var source = buildDiagram(mql.matches ? palettes.dark : palettes.light);
+      var id = "flow-diagram-svg-" + (++renderCount);
+      mermaid.render(id, source).then(function (result) {
+        el.innerHTML = result.svg;
+        if (result.bindFunctions) result.bindFunctions(el);
+
+        var svgEl = el.querySelector("svg");
+        svgEl.style.maxWidth = "none";
+        svgEl.removeAttribute("height");
+
+        if (panZoomInstance) { panZoomInstance.destroy(); panZoomInstance = null; }
+        panZoomInstance = svgPanZoom(svgEl, {
+          panEnabled: true,
+          zoomEnabled: true,
+          controlIconsEnabled: false,
+          fit: true,
+          center: true,
+          minZoom: 0.4,
+          maxZoom: 8,
+          zoomScaleSensitivity: 0.35
+        });
+      });
+    }
+    render();
+    mql.addEventListener("change", render);
+
+    window.addEventListener("resize", function () {
+      if (panZoomInstance) { panZoomInstance.resize(); panZoomInstance.fit(); panZoomInstance.center(); }
+    });
+
+    document.getElementById("zoom-in").addEventListener("click", function () {
+      if (panZoomInstance) panZoomInstance.zoomIn();
+    });
+    document.getElementById("zoom-out").addEventListener("click", function () {
+      if (panZoomInstance) panZoomInstance.zoomOut();
+    });
+    document.getElementById("zoom-reset").addEventListener("click", function () {
+      if (panZoomInstance) { panZoomInstance.resetZoom(); panZoomInstance.fit(); panZoomInstance.center(); }
+    });
+    document.getElementById("zoom-fullscreen").addEventListener("click", function () {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else if (viewport.requestFullscreen) {
+        viewport.requestFullscreen();
+      }
+    });
+    document.addEventListener("fullscreenchange", function () {
+      if (panZoomInstance) {
+        setTimeout(function () {
+          panZoomInstance.resize();
+          panZoomInstance.fit();
+          panZoomInstance.center();
+        }, 50);
+      }
+    });
+  })();
+</script>
+
+<script>
+  (function () {
+    var buttons = document.querySelectorAll(".tab-btn");
+    var panels = document.querySelectorAll(".panel");
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var target = btn.getAttribute("data-tab");
+        buttons.forEach(function (b) { b.setAttribute("aria-selected", String(b === btn)); });
+        panels.forEach(function (p) {
+          p.classList.toggle("active", p.id === "panel-" + target);
+        });
+        window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+        if (target === "flow") {
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              window.dispatchEvent(new Event("resize"));
+            });
+          });
+        }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
